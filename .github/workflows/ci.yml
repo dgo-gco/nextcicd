@@ -24,3 +24,6 @@ jobs:
 
       - name: docker up
         run: docker compose up
+
+      - name: install dependencies
+        run: docker compose exec
