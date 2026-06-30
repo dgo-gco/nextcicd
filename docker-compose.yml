@@ -33,7 +33,7 @@ services:
     volumes:
       - redis-data:/data
     environment:
-      - REDIS_ARG=redisarg
+      - REDIS_ARGS="--appendonly yes"
     networks:
       - myapp
 
@@ -43,3 +43,4 @@ networks:
 
 volumes:
   pgdata:
+  redis-data:
