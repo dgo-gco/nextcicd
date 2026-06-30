@@ -24,9 +24,6 @@ jobs:
       - name: docker up
         run: docker compose up -d
 
-      - name: debug frontend files
-        run: docker compose exec -T node ls -la /front/front
-
       - name: install dependencies
         run: docker compose exec -T -w /front/front node npm ci
 
@@ -40,6 +37,47 @@ jobs:
         if: always()
         run: docker compose down
 
-#  install-next:
-#    needs: build_docker
-#    runs-on: ubuntu-latest
+  check_image_docker:
+    needs: build_docker
+    runs-on: ubuntu-latest
+
+    steps:
+      #- name: login to docker hub
+      #  uses: docker/login-action@v3
+      #  with:
+      #    username: ${{secrets.DOCKER_USER}}
+      #    password: ${{secrets.DOCKER_PSW}}
+
+      #- name: docker scout
+      #  uses: docker/scout-action@v1
+      #  with:
+      #    command: cves
+      #    image: postgres:18-alpine3.24
+      #    to: postgres:latest
+      #    ignore-unchanged: true
+      #    only-fixed: true
+
+      - name: trivy scan image
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: postgres:18-alpine3.24
+          format: "table"
+          exit-code: 0
+          ignore-unfixed: "false"
+          severity: "HIGH,CRITICAL"
+
+  renovate:
+    needs: check_image_docker
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v7
+
+      - name: run renovate
+        uses: renovatebot/github-action@v46.1.17
+        with:
+          token: ${{secrets.GITHUB_TOKEN}}
+        env:
+          LOG_LEVEL: "debug"
+          RENOVATE_REPOSITORIES: ${{github.repository}}
