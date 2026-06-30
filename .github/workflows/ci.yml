@@ -24,8 +24,11 @@ jobs:
       - name: docker up
         run: docker compose up -d
 
+      - name: debug frontend files
+        run: docker compose exec -T node ls -la /front/front
+
       - name: install dependencies
-        run: docker compose exec -T -w /front node npm ci
+        run: docker compose exec -T -w /front/front node npm ci
 
       #- name: run test
       #  run: docker compose exec -T -w /front/front node npm test -- --ci --passWithNoTests
