@@ -7,7 +7,7 @@ services:
       - ./:/front
     ports:
       - "3000:3000"
-    tty: yes
+    tty: true
     networks:
       - myapp
 
